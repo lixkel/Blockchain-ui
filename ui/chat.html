@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="generator" charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="app.css">
+    <title>Chat</title>
+    <script src="eel.js"></script>
+    <script src="app.js" type="text/javascript" charset="utf-8"></script>
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="sidebar">
+          <ul>
+              <li><a href="index.html">Ú</a></li>
+              <li><a href="html.html">H</a></li>
+              <li><a href="css.html">C</a></li>
+              <li><a href="php.html">P</a></li>
+              <li><a href="javascript.html">J</a></li>
+          </ul>
+      </div>
+      <div class="head">KKT
+        <label class="switch">
+          <input id="chat_checkbox" type="checkbox">
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="chat">
+      </div>
+      <div class="box">
+        <input type="text" id="chat_input" placeholder="Stlac Enter pre odoslanie" @keyup.enter="eel.send_msg" autofocus  />
+        <button onclick="input_get()">SEND</button>
+      </div>
+      <script type="text/javascript" charset="utf-8">
+        var chat_key = "";
+        var current_rowid = null;
+        load();
+      </script>
+    </div>
+  </body>
+</html>
