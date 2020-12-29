@@ -482,7 +482,7 @@ sync = [True, 0, None]#[synced, time of sending, nodes address]
 conn = sqlite3.connect("nodes.db")
 c = conn.cursor()
 logging.basicConfig(filename='blockchain.log', level=logging.DEBUG, format='%(threadName)s: %(asctime)s %(message)s', filemode="w")
-blockchain = Blockchain(version, send_message, sync, logging)
+blockchain = Blockchain(version, send_message, sync, ui_in, logging)
 local_node = threading.Thread(target=p2p.start_node, args=(port, nodes, inbound, outbound, ban_list, logging))
 local_node.start()
 tui = threading.Thread(target=ui.main, args=(blockchain.pub_keys, ui_in, ui_out))
@@ -587,17 +587,13 @@ try:
                 b, d = b
                 outbound.put(["connect", [b, d, send_message("version1", cargo=b)]])
             elif a == "send":
-                b, d, e = b
-                if b == "":
-                    display.put(blockchain.pub_keys)
+                receiver_key, msg, msg_type = b
+                if msg_type:
+                    msg_type = "01"
                 else:
-                    if e == "0":
-                        e = "02"
-                    else:
-                        e = "01"
-                    pub_key = list(blockchain.pub_keys.keys())[b]
-                    cargo = [d, pub_key, e]
-                    send_message("send", cargo=cargo)
+                    msg_type = "02"
+                cargo = [msg, receiver_key, msg_type]
+                send_message("send", cargo=cargo)
             elif a == "import":
                 b, d = b
                 blockchain.save_key(b, d)
@@ -605,8 +601,6 @@ try:
                 send_message("send", cargo=cargo)
             elif a == "export":
                 display.put(blockchain.public_key_hex)
-            elif a == "lsimported":
-                display.put(blockchain.pub_keys)
             elif a == "lsnodes":
                 display.put(list(nodes.values()))
             elif a == "start mining":

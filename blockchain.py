@@ -1,5 +1,5 @@
 class Blockchain:
-    def __init__(self, version, send_message, sync1, log):
+    def __init__(self, version, send_message, sync1, ui_in, log):
         import sqlite3
         from time import time
         from os import urandom
@@ -19,8 +19,11 @@ class Blockchain:
         sync = sync1
         logging = log
         self.version = version
+        self.ui_in = ui_in
         self.conn = sqlite3.connect("blockchain.db")
         self.c = self.conn.cursor()
+        self.conn_m = sqlite3.connect("messages.db")
+        self.c_m = self.conn_m.cursor()
         self.send_message = send_message
         self.mempool = []
         self.valid_tx = []
@@ -228,6 +231,7 @@ class Blockchain:
                 self.pub_keys[peer_pub_key][1] = derived_key.hex()
                 logging.debug("posuvam do edit key files")
                 self.edit_key_file(peer_pub_key, derived_key.hex())#musim kukat aj tx od seba ktore nemam
+                return
             elif tx_type == "01":
                 nonce = bytes.fromhex(tx[2:34])
                 msg_size = int(tx[34:38], 16) * 2
@@ -249,6 +253,11 @@ class Blockchain:
                 msg_size = int(tx[2:6], 16) * 2
                 msg = bytes.fromhex(tx[6:msg_size+6]).decode("utf-8")
                 print(f"{user[0]}: {msg}")
+            timestamp = int(tx[-264:-256], 16)
+            self.c_m.execute(f"INSERT INTO '{peer_pub_key}' VALUES (?,?,?,?);", (timestamp, msg, 0, int(not int(tx_type)-1)))
+            self.conn_m.commit()
+            ui_in.put(["new", [peer_pub_key, timestamp, msg, 0, int(not int(tx_type)-1)]])
+#tento krkolomny zapis s int meni tx_type "01"=1 a "02"=0 na bit encryption pritom vyuziva ze 0 a 1 sa daju brat ako boolen hodnoty
 
 
     def hash(self, tx):
@@ -319,8 +328,9 @@ class Blockchain:
             tx = "00" + self.dh_public_key_hex + hex(int(time()))[2:] + rec_key + self.public_key_hex
             tx = bytes.fromhex(tx)
         else:
+            raw_msg = msg
             msg = msg.encode("utf-8")
-            if msg_type == "01":
+            if msg_type:
                 logging.debug(f"rec_key: {rec_key}")
                 for i in self.pub_keys:
                     logging.debug(f"{i}: {self.pub_keys[i]}")
@@ -339,13 +349,12 @@ class Blockchain:
             msg = msg.hex()
             if len(msg) <= 2000:
                 msg_size = self.fill(hex(len(bytes.fromhex(msg)))[2:], 4)
-                timestamp = hex(int(time()))[2:]
-                tx = msg_size + msg + timestamp + rec_key + self.public_key_hex
-                if msg_type == "01":
-                    tx = "01" + nonce.hex() + tx
-                else:
-                    tx = "02" + tx
+                current_time = int(time())
+                timestamp = hex(current_time)[2:]
+                tx = msg_type + msg_size + msg + timestamp + rec_key + self.public_key_hex
                 tx = bytes.fromhex(tx)
+                self.c_m.execute(f"INSERT INTO '{rec_key}' VALUES (?,?,?,?);", (current_time, raw_msg, 1, int(not int(msg_type)-1)))
+                self.conn_m.commit()
             else:#tu treba dat aj
                 print("sprava je prilis velka")
         signature = self.private_key.sign(tx)

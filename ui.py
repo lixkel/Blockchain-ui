@@ -14,7 +14,10 @@ def main(pu_keys, ui_in, ui_ot):
 
     while True:
         if not ui_in.empty():
-            pass
+            a, b = ui_in.get()
+            if a == "new":
+                rec_key, timestamp, msg, sender, encryption = b
+                eel.add_msg_start(timestamp, msg, sender, encryption, rec_key)
         eel.sleep(2.0)
 
 
@@ -24,7 +27,8 @@ def import_key(new_key, name):
         c.execute("""CREATE TABLE (?) (
             timestamp INTEGER,
             message TEXT,
-            sender INTEGER)
+            sender INTEGER,
+            encryption INTEGER)
             """, (new_key,))
         conn.commit()
     ui_out.put(("import", (new_key, name)))
@@ -35,7 +39,8 @@ def send_msg(msg, receiver_key, encryption):
     global time, datetime
     if len(msg.encode("utf-8").hex()) <= 1000:
         timestamp = datetime.datetime.utcfromtimestamp(int(time())).strftime('%Y-%m-%d %H:%M:%S')
-        eel.add_msg_start(timestamp, msg, "Me")
+        ui_out.put(["send", [receiver_key, msg, encryption]])
+        eel.add_msg_start(timestamp, msg, "Me", encryption, receiver_key)
 
 
 @eel.expose
@@ -44,7 +49,6 @@ def request_keys():
         return
     user_keys = []
     for key in pub_keys:
-        print(key)
         c.execute(f"SELECT * FROM '{key}' WHERE rowid = (SELECT MAX(rowid) FROM '{key}')")
         query = c.fetchone()
         if query[2] == 0:
@@ -71,10 +75,9 @@ def request_msg(key, current_rowid):
         c.execute(f"SELECT * FROM '{key}' WHERE rowid = (?)", (rowid,))
         query = list(c.fetchone())
         query[0] = datetime.datetime.utcfromtimestamp(query[0]).strftime('%Y-%m-%d %H:%M:%S')
-        if query[2] == 0:
+        if not query[2]:
             query[2] = name
         else:
             query[2] = "Me"
+        eel.add_msg_end(query[0], query[1], query[2], bool(query[3]), rowid)
         rowid -= 1
-        print(query)
-        eel.add_msg_end(query[0], query[1], query[2])
