@@ -2,8 +2,9 @@
 <html>
   <head>
     <meta name="generator" charset="utf-8">
+    <meta name="keywords" content="HTML, uvod do html">
     <link rel="stylesheet" type="text/css" href="app.css">
-    <title>Chat</title>
+    <title>Úvod</title>
     <script src="eel.js"></script>
     <script src="app.js" type="text/javascript" charset="utf-8"></script>
   </head>
@@ -18,22 +19,14 @@
               <li><a href="javascript.html">J</a></li>
           </ul>
       </div>
-      <div class="head">KKT
-        <label class="switch">
-          <input id="chat_checkbox" type="checkbox" checked>
-          <span class="slider"></span>
-        </label>
+      <div class="export"></div>
+      <div class="import">
+        <input type="text" id="key_input" placeholder="Tu zadaj kľúč na importovanie"/>
+        <hr>
+        <input type="text" id="name_input" placeholder="Tu zadaj meno vlastníka kľúču"/>
+        <button onclick="import_key()">IMPORT</button>
       </div>
-      <div class="chat">
-      </div>
-      <div class="box">
-        <input type="text" id="chat_input" placeholder="Stlac Enter pre odoslanie" autofocus  />
-        <button onclick="input_get()">SEND</button>
-      </div>
-      <script type="text/javascript" charset="utf-8">
-        var current_rowid = null;
-        load();
-      </script>
     </div>
+    <script>eel.export_key()</script>
   </body>
 </html>

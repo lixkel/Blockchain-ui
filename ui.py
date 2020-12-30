@@ -3,10 +3,11 @@ import sqlite3
 import datetime
 from time import time
 
-def main(pu_keys, ui_in, ui_ot):
-    global c, conn, ui_out, pub_keys, pub_keys, sqlite3
+def main(pu_keys, ui_in, ui_ot, my_key):
+    global c, conn, ui_out, pub_keys, my_pub_key, sqlite3
     pub_keys = pu_keys
     ui_out = ui_ot
+    my_pub_key = my_key
     conn = sqlite3.connect("messages.db")
     c = conn.cursor()
     eel.init("ui")
@@ -32,6 +33,26 @@ def import_key(new_key, name):
             """, (new_key,))
         conn.commit()
     ui_out.put(("import", (new_key, name)))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    #treba create table aj pri prijmani a takisto uz neviem jak som to chcel s tym uvodnym oznamom mozno INFO by bolo fajn
+
+
+@eel.expose
+def export_key():
+    eel.insert_exported_key(my_pub_key)
 
 
 @eel.expose

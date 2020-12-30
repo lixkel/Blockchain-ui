@@ -208,3 +208,28 @@ input:checked + .slider:before {
   -ms-transform: translateX(26px);
   transform: translateX(26px);
 }
+
+.wrapper .import {
+  position: fixed;
+  top: 50%;
+  left: 25%;
+  width: 10%;
+  width: 50%;
+  background-color: #36393f;
+  padding: 0.5rem;
+}
+
+.wrapper .import input {
+  width: 100%;
+  border: 1px solid #23262a;
+  background: #36393f;
+  padding: 0.5rem;
+  color: hsla(0,0%,100%,.7);
+  font-size: 12px;
+}
+
+.wrapper .import hr {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  visibility: hidden;
+}

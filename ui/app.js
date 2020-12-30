@@ -1,3 +1,5 @@
+var chat_key = "";
+
 function load(){
 	const urlParams = new URLSearchParams(window.location.search);
 	chat_key = urlParams.get('key');
@@ -36,7 +38,22 @@ function add_key(time, msg, sender, key, name){
 	user_list.innerHTML = `<li><a href="chat.html?key=${key}">${name}<span class="little">${time}</span><div class="little">${msg}</div></a></li>` + user_list.innerHTML;
 }
 
+function import_key(){
+	var key_input = document.getElementById("key_input");
+	var name_input = document.getElementById("name_input");
+	var new_key = key_input.value;
+	var new_name = name_input.value;
+	key_input.value = "";
+	name_input.value = "";
+	eel.import_key(new_key, new_name)
+}
+
+function insert_exported_key(key){
+	var export_key = document.getElementsByClassName("export")[0];
+	export_key.innerHTML = key
+}
 
 eel.expose(add_msg_end);
 eel.expose(add_msg_start);
 eel.expose(add_key);
+eel.expose(insert_exported_key);
