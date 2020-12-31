@@ -31,23 +31,10 @@ def import_key(new_key, name):
             sender INTEGER,
             encryption INTEGER)
             """, (new_key,))
+        init_msg = "Začal si komunikáciu, ešte nemôžeš posielať šifrované správy"
+        c.execute(f"INSERT INTO '{new_key}' VALUES (?,?,?,?);", (int(time()), init_msg, 3, 1))
         conn.commit()
-    ui_out.put(("import", (new_key, name)))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    #treba create table aj pri prijmani a takisto uz neviem jak som to chcel s tym uvodnym oznamom mozno INFO by bolo fajn
+        ui_out.put(("import", (new_key, name)))
 
 
 @eel.expose
@@ -59,8 +46,11 @@ def export_key():
 def send_msg(msg, receiver_key, encryption):
     global time, datetime
     if len(msg.encode("utf-8").hex()) <= 1000:
-        timestamp = datetime.datetime.utcfromtimestamp(int(time())).strftime('%Y-%m-%d %H:%M:%S')
+        current_time = int(time())
+        timestamp = datetime.datetime.utcfromtimestamp(current_time).strftime('%Y-%m-%d %H:%M:%S')
         ui_out.put(["send", [receiver_key, msg, encryption]])
+        c.execute(f"INSERT INTO '{receiver_key}' VALUES (?,?,?,?);", (current_time, msg, 1, int(encryption)))
+        conn.commit()
         eel.add_msg_start(timestamp, msg, "Me", encryption, receiver_key)
 
 
@@ -72,10 +62,12 @@ def request_keys():
     for key in pub_keys:
         c.execute(f"SELECT * FROM '{key}' WHERE rowid = (SELECT MAX(rowid) FROM '{key}')")
         query = c.fetchone()
-        if query[2] == 0:
+        if not query[2]:
             query[2] == pub_keys[key][0]
-        else:
+        elif query[2] :
             query[2] == "Me"
+        else:
+            query[2] == "Info"
         user_keys.append([query[0], query[1], query[2], key])
     user_keys.sort(key=lambda x: x[0])
     for key in user_keys:
@@ -98,7 +90,10 @@ def request_msg(key, current_rowid):
         query[0] = datetime.datetime.utcfromtimestamp(query[0]).strftime('%Y-%m-%d %H:%M:%S')
         if not query[2]:
             query[2] = name
-        else:
+        elif query[2]:
             query[2] = "Me"
+        else:
+            query[2] = "Info"
         eel.add_msg_end(query[0], query[1], query[2], bool(query[3]), rowid)
         rowid -= 1
+    eel.update_scroll()

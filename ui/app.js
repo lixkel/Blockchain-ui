@@ -14,7 +14,6 @@ function input_get(){
 	}
 	input.value = "";
 	var encryption = document.getElementById("chat_checkbox").checked;
-	alert(encryption)
 	eel.send_msg(msg, chat_key, encryption);
 }
 
@@ -22,6 +21,7 @@ function add_msg_end(time, msg, sender, encryption, rowid){
 	current_rowid = rowid;
 	var chat = document.getElementsByClassName("chat")[0];
 	chat.innerHTML = `<hr class="divider" /><div class="message"><div class="username">${encryption} ${sender}<span class="timestamp">${time}</span></div><div class="content">${msg}</div></div>` + chat.innerHTML;
+	update_scroll();
 }
 
 function add_msg_start(time, msg, sender, encryption, receiver_key){
@@ -31,6 +31,7 @@ function add_msg_start(time, msg, sender, encryption, receiver_key){
 	}
 	var chat = document.getElementsByClassName("chat")[0];
 	chat.innerHTML += `<hr class="divider" /><div class="message"><div class="username">${encryption} ${sender}<span class="timestamp">${time}</span></div><div class="content">${msg}</div></div>`;
+	update_scroll()
 }
 
 function add_key(time, msg, sender, key, name){
@@ -53,7 +54,13 @@ function insert_exported_key(key){
 	export_key.innerHTML = key
 }
 
+function update_scroll(){
+    var chat = document.getElementById("chat");
+    chat.scrollIntoView(false);
+}
+
 eel.expose(add_msg_end);
 eel.expose(add_msg_start);
 eel.expose(add_key);
 eel.expose(insert_exported_key);
+eel.expose(update_scroll);
