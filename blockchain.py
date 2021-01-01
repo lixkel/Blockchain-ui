@@ -158,6 +158,7 @@ class Blockchain:
             msg_size += 32
         else:
             msg_size = int(tx[2:6], 16) * 2
+        print(f"msg_size: {msg_size}")
         if msg_size > 2000:
             logging.debug("msg size je moc velka")
             return False
@@ -205,17 +206,37 @@ class Blockchain:
 
 
     def tx_content(self, tx):
-        if tx[-256:-192] == self.public_key_hex:
+        sender = False
+        if tx[-192:-128] == self.public_key_hex:
+            sender = True
+        if tx[-256:-192] == self.public_key_hex or sender:
             tx_type = tx[:2]
             logging.debug(f"{tx_type}")
-            peer_pub_key = tx[-192:-128]
+            if sender:
+                peer_pub_key = tx[-256:-192]
+            else:
+                peer_pub_key = tx[-192:-128]
+            timestamp = int(tx[-264:-256], 16)
             try:
                 user = self.pub_keys[peer_pub_key]
             except KeyError:
                 self.save_key(peer_pub_key)
                 user = self.pub_keys[peer_pub_key]
+                self.c_m.execute("""CREATE TABLE (?) (
+                    timestamp INTEGER,
+                    message TEXT,
+                    sender INTEGER,
+                    encryption INTEGER)
+                    """, (peer_pub_key,))
+                init_msg = "Komunikácia bola zahájená druhou stranou, ešte nemôžeš posielať šifrované správy"
+                self.c_m.execute(f"INSERT INTO '{new_key}' VALUES (?,?,?,?);", (int(time()), init_msg, 3, 1))
+                self.conn_m.commit()
             logging.debug(f"user: {user}")
             if tx_type == "00":
+                if sender:
+                    if user[1] == "no":
+                        user[1] = "sent"
+                    return
                 logging.debug("som v 00")
                 dh_peer_key = X25519PublicKey.from_public_bytes(bytes.fromhex(tx[2:66]))
                 shared_key = self.dh_private_key.exchange(dh_peer_key)
@@ -226,18 +247,22 @@ class Blockchain:
                                 info=b'blockchain',
                                 backend=backend,
                                 ).derive(shared_key)
-                if user[1] != "sent" and sync[0] == True:#mozno by som nemal prijimat tx pocas syncovania
+                if user[1] != "sent":#mozno by som nemal prijimat tx pocas syncovania
                     self.send_message("send", cargo=["", peer_pub_key, "00"])
                 self.pub_keys[peer_pub_key][1] = derived_key.hex()
                 logging.debug("posuvam do edit key files")
                 self.edit_key_file(peer_pub_key, derived_key.hex())#musim kukat aj tx od seba ktore nemam
+                exchange_msg = "Výmena kľúčov prebehla úspešne odteraz môžeš správy posielať šifrované"
+                self.c_m.execute(f"INSERT INTO '{new_key}' VALUES (?,?,?,?);", (timestamp, exchange_msg, 3, 1))
+                self.conn_m.commit()
+                self.ui_in.put(["new", [timestamp, exchange_msg, "Info", 1, peer_pub_key]])
                 return
             elif tx_type == "01":
                 nonce = bytes.fromhex(tx[2:34])
                 msg_size = int(tx[34:38], 16) * 2
                 msg = bytes.fromhex(tx[38:msg_size+38])
                 if user[1] == "no" or user[1] == "sent":
-                    if user[0] == "__unknown" and user[1] == "no":
+                    if user[0] == "__unknown" and user[1] == "no" and not sender:
                         self.del_pub_key(peer_pub_key)
                         del self.pub_keys[peer_pub_key]
                     print("sifrovana sprava ale neprebehla vymena klucov")
@@ -253,10 +278,14 @@ class Blockchain:
                 msg_size = int(tx[2:6], 16) * 2
                 msg = bytes.fromhex(tx[6:msg_size+6]).decode("utf-8")
                 print(f"{user[0]}: {msg}")
-            timestamp = int(tx[-264:-256], 16)
-            self.c_m.execute(f"INSERT INTO '{peer_pub_key}' VALUES (?,?,?,?);", (timestamp, msg, 0, int(not int(tx_type)-1)))
+            msg_sender = 0
+            name = user[0]
+            if sender:
+                msg_sender = 1
+                name = "Me"
+            self.c_m.execute(f"INSERT INTO '{peer_pub_key}' VALUES (?,?,?,?);", (timestamp, msg, msg_sender, int(not int(tx_type)-1)))
             self.conn_m.commit()
-            ui_in.put(["new", [peer_pub_key, timestamp, msg, 0, int(not int(tx_type)-1)]])
+            self.ui_in.put(["new", [timestamp, msg, user[0], int(not int(tx_type)-1)], peer_pub_key])
 #tento krkolomny zapis s int meni tx_type "01"=1 a "02"=0 na bit encryption pritom vyuziva ze 0 a 1 sa daju brat ako boolen hodnoty
 
 
@@ -328,8 +357,10 @@ class Blockchain:
             tx = "00" + self.dh_public_key_hex + hex(int(time()))[2:] + rec_key + self.public_key_hex
             tx = bytes.fromhex(tx)
         else:
+            print(f"msg: {msg}")
             raw_msg = msg
             msg = msg.encode("utf-8")
+            nonce = ""
             if msg_type:
                 logging.debug(f"rec_key: {rec_key}")
                 for i in self.pub_keys:
@@ -346,12 +377,14 @@ class Blockchain:
                 cipher = Cipher(algorithm, mode=None, backend=backend)
                 encryptor = cipher.encryptor()
                 msg = encryptor.update(msg)
+                nonce = nonce.hex()
             msg = msg.hex()
+            print(f"msg hex: {msg}")
             if len(msg) <= 2000:
                 msg_size = self.fill(hex(len(bytes.fromhex(msg)))[2:], 4)
                 current_time = int(time())
                 timestamp = hex(current_time)[2:]
-                tx = msg_type + msg_size + msg + timestamp + rec_key + self.public_key_hex
+                tx = msg_type + nonce + msg_size + msg + timestamp + rec_key + self.public_key_hex
                 tx = bytes.fromhex(tx)
                 self.c_m.execute(f"INSERT INTO '{rec_key}' VALUES (?,?,?,?);", (current_time, raw_msg, 1, int(not int(msg_type)-1)))
                 self.conn_m.commit()
