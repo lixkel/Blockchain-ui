@@ -4,10 +4,12 @@ import datetime
 from time import time
 
 def main(pu_keys, ui_in, ui_ot, my_key):
-    global c, conn, ui_out, pub_keys, my_pub_key, sqlite3
+    global c, conn, ui_out, pub_keys, my_pub_key, mine, mining_log, sqlite3
     pub_keys = pu_keys
     ui_out = ui_ot
     my_pub_key = my_key
+    mine = False
+    mining_log = ""
     conn = sqlite3.connect("messages.db")
     c = conn.cursor()
     eel.init("ui")
@@ -19,6 +21,11 @@ def main(pu_keys, ui_in, ui_ot, my_key):
             if a == "new":
                 timestamp, msg, sender, encryption, rec_key = b
                 eel.add_msg_start(timestamp, msg, sender, encryption, rec_key)
+            if a == "mined":
+                timestamp = datetime.datetime.utcfromtimestamp(b).strftime('%Y-%m-%d %H:%M:%S')
+                entry = f"{timestamp} You mined new block\n"
+                mining_log += entry
+                eel.insert_mining_log(entry)
         eel.sleep(2.0)
 
 
@@ -98,3 +105,26 @@ def request_msg(key, current_rowid):
         eel.add_msg_end(query[0], query[1], query[2], bool(query[3]), rowid)
         rowid -= 1
     eel.update_scroll()
+
+
+@eel.expose
+def mining():
+    global mine
+    if mine:
+        ui_out.put(["stop mining", None])
+        eel.edit_mining("START MINING")
+        mining_log = ""
+    else:
+        ui_out.put(["start mining", None])
+        eel.edit_mining("STOP MINING")
+    mine = not mine
+
+
+@eel.expose
+def get_mining_log():
+    eel.insert_mining_log(mining_log)
+
+
+@eel.expose
+def get_name(key):
+    eel.insert_name(pub_keys[key][0])

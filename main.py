@@ -550,6 +550,7 @@ try:
             if blockchain.append(new_block, sync[0]) == True:
                 message = "01" + new_block_hash
                 send_message("broadcast", cargo=[message, "headers"])
+                ui_in.put(["mined", int(time())])
             else:
                 logging.debug("block neappendnuty")
             start_mining()
