@@ -17,20 +17,20 @@ def main(pu_keys, ui_in, ui_ot, my_key):
         if not ui_in.empty():
             a, b = ui_in.get()
             if a == "new":
-                rec_key, timestamp, msg, sender, encryption = b
+                timestamp, msg, sender, encryption, rec_key = b
                 eel.add_msg_start(timestamp, msg, sender, encryption, rec_key)
         eel.sleep(2.0)
 
 
 @eel.expose
 def import_key(new_key, name):
-    if new_key not in nodes.keys():
-        c.execute("""CREATE TABLE (?) (
+    if new_key not in list(pub_keys.keys()):
+        c.execute(f"""CREATE TABLE '{new_key}' (
             timestamp INTEGER,
             message TEXT,
             sender INTEGER,
             encryption INTEGER)
-            """, (new_key,))
+            """)
         init_msg = "Začal si komunikáciu, ešte nemôžeš posielať šifrované správy"
         c.execute(f"INSERT INTO '{new_key}' VALUES (?,?,?,?);", (int(time()), init_msg, 3, 1))
         conn.commit()
@@ -48,9 +48,10 @@ def send_msg(msg, receiver_key, encryption):
     if len(msg.encode("utf-8").hex()) <= 1000:
         current_time = int(time())
         timestamp = datetime.datetime.utcfromtimestamp(current_time).strftime('%Y-%m-%d %H:%M:%S')
+        print("putujem do ui_out")
         ui_out.put(["send", [receiver_key, msg, encryption]])
-        c.execute(f"INSERT INTO '{receiver_key}' VALUES (?,?,?,?);", (current_time, msg, 1, int(encryption)))
-        conn.commit()
+        #c.execute(f"INSERT INTO '{receiver_key}' VALUES (?,?,?,?);", (current_time, msg, 1, int(encryption)))
+        #conn.commit()
         eel.add_msg_start(timestamp, msg, "Me", encryption, receiver_key)
 
 

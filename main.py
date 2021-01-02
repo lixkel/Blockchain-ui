@@ -485,7 +485,7 @@ logging.basicConfig(filename='blockchain.log', level=logging.DEBUG, format='%(th
 blockchain = Blockchain(version, send_message, sync, ui_in, logging)
 local_node = threading.Thread(target=p2p.start_node, args=(port, nodes, inbound, outbound, ban_list, logging))
 local_node.start()
-tui = threading.Thread(target=ui.main, args=(blockchain.pub_keys, ui_in, ui_out))
+tui = threading.Thread(target=ui.main, args=(blockchain.pub_keys, ui_in, ui_out, blockchain.public_key_hex))
 tui.start()
 
 c.execute("SELECT count(name) FROM sqlite_master WHERE type='table' AND name='nodes'")
@@ -599,8 +599,6 @@ try:
                 blockchain.save_key(b, d)
                 cargo = ["", b, "00"]
                 send_message("send", cargo=cargo)
-            elif a == "export":
-                display.put(blockchain.public_key_hex)
             elif a == "lsnodes":
                 display.put(list(nodes.values()))
             elif a == "start mining":
@@ -637,5 +635,6 @@ try:
 
 except:
     logging.error(traceback.format_exc())
+    print("crash daco sa pokazilo!!!!!!!!!!!!!!!!!!!!!!!!")
     outbound.put(["end", []])
     local_node.join()

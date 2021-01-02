@@ -1,8 +1,12 @@
 var chat_key = "";
 
-function load(){
+function init_load(){
 	const urlParams = new URLSearchParams(window.location.search);
 	chat_key = urlParams.get('key');
+	eel.request_msg(chat_key, current_rowid);
+}
+
+function msg_load(){
 	eel.request_msg(chat_key, current_rowid);
 }
 
@@ -19,8 +23,13 @@ function input_get(){
 
 function add_msg_end(time, msg, sender, encryption, rowid){
 	current_rowid = rowid;
+	var button = document.getElementById("button");
+	button.remove();
 	var chat = document.getElementsByClassName("chat")[0];
 	chat.innerHTML = `<hr class="divider" /><div class="message"><div class="username">${encryption} ${sender}<span class="timestamp">${time}</span></div><div class="content">${msg}</div></div>` + chat.innerHTML;
+	if (current_rowid != 1){
+		chat.innerHTML = `<button onclick="msg_load()" id="button">Load msg</button>` + chat.innerHTML;
+	}
 	update_scroll();
 }
 

@@ -222,14 +222,14 @@ class Blockchain:
             except KeyError:
                 self.save_key(peer_pub_key)
                 user = self.pub_keys[peer_pub_key]
-                self.c_m.execute("""CREATE TABLE (?) (
+                self.c_m.execute(f"""CREATE TABLE '{peer_pub_key}' (
                     timestamp INTEGER,
                     message TEXT,
                     sender INTEGER,
                     encryption INTEGER)
-                    """, (peer_pub_key,))
+                    """)
                 init_msg = "Komunikácia bola zahájená druhou stranou, ešte nemôžeš posielať šifrované správy"
-                self.c_m.execute(f"INSERT INTO '{new_key}' VALUES (?,?,?,?);", (int(time()), init_msg, 3, 1))
+                self.c_m.execute(f"INSERT INTO '{peer_pub_key}' VALUES (?,?,?,?);", (int(time()), init_msg, 3, 1))
                 self.conn_m.commit()
             logging.debug(f"user: {user}")
             if tx_type == "00":
@@ -253,7 +253,7 @@ class Blockchain:
                 logging.debug("posuvam do edit key files")
                 self.edit_key_file(peer_pub_key, derived_key.hex())#musim kukat aj tx od seba ktore nemam
                 exchange_msg = "Výmena kľúčov prebehla úspešne odteraz môžeš správy posielať šifrované"
-                self.c_m.execute(f"INSERT INTO '{new_key}' VALUES (?,?,?,?);", (timestamp, exchange_msg, 3, 1))
+                self.c_m.execute(f"INSERT INTO '{peer_pub_key}' VALUES (?,?,?,?);", (timestamp, exchange_msg, 3, 1))
                 self.conn_m.commit()
                 self.ui_in.put(["new", [timestamp, exchange_msg, "Info", 1, peer_pub_key]])
                 return
@@ -285,7 +285,7 @@ class Blockchain:
                 name = "Me"
             self.c_m.execute(f"INSERT INTO '{peer_pub_key}' VALUES (?,?,?,?);", (timestamp, msg, msg_sender, int(not int(tx_type)-1)))
             self.conn_m.commit()
-            self.ui_in.put(["new", [timestamp, msg, user[0], int(not int(tx_type)-1)], peer_pub_key])
+            self.ui_in.put(["new", [timestamp, msg, user[0], not int(tx_type)-1, peer_pub_key]])
 #tento krkolomny zapis s int meni tx_type "01"=1 a "02"=0 na bit encryption pritom vyuziva ze 0 a 1 sa daju brat ako boolen hodnoty
 
 
@@ -361,7 +361,7 @@ class Blockchain:
             raw_msg = msg
             msg = msg.encode("utf-8")
             nonce = ""
-            if msg_type:
+            if msg_type == "01":
                 logging.debug(f"rec_key: {rec_key}")
                 for i in self.pub_keys:
                     logging.debug(f"{i}: {self.pub_keys[i]}")
@@ -384,6 +384,7 @@ class Blockchain:
                 msg_size = self.fill(hex(len(bytes.fromhex(msg)))[2:], 4)
                 current_time = int(time())
                 timestamp = hex(current_time)[2:]
+                print(f"nonce: {nonce}")
                 tx = msg_type + nonce + msg_size + msg + timestamp + rec_key + self.public_key_hex
                 tx = bytes.fromhex(tx)
                 self.c_m.execute(f"INSERT INTO '{rec_key}' VALUES (?,?,?,?);", (current_time, raw_msg, 1, int(not int(msg_type)-1)))
