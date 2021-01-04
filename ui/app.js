@@ -31,7 +31,6 @@ function add_msg_end(time, msg, sender, encryption, rowid){
 	if (current_rowid != 1){
 		chat.innerHTML = `<button onclick="msg_load()" id="button">Load msg</button>` + chat.innerHTML;
 	}
-	update_scroll();
 }
 
 function add_msg_start(time, msg, sender, encryption, receiver_key){
@@ -65,6 +64,9 @@ function insert_exported_key(key){
 }
 
 function insert_mining_log(entry){
+	if (location.href.split("/").slice(-1) != "mining.html"){
+		return;
+	}
 	var log = document.getElementsByClassName("log")[0];
 	log.innerHTML += entry;
 }
@@ -81,7 +83,12 @@ function update_scroll(){
 
 function insert_name(name){
     var head = document.getElementsByClassName("head")[0];
-    head.innerHTML = name + head.innerHTML;
+    head.innerHTML = name + '<button onclick="edit()">EDIT</button>' + head.innerHTML;
+}
+
+function edit(){
+    var new_name = window.prompt("Zadaj nové meno pre tohto použivatela","Martin...");
+		eel.edit(chat_key, new_name)
 }
 
 eel.expose(add_msg_end);

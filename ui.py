@@ -57,8 +57,6 @@ def send_msg(msg, receiver_key, encryption):
         timestamp = datetime.datetime.utcfromtimestamp(current_time).strftime('%Y-%m-%d %H:%M:%S')
         print("putujem do ui_out")
         ui_out.put(["send", [receiver_key, msg, encryption]])
-        #c.execute(f"INSERT INTO '{receiver_key}' VALUES (?,?,?,?);", (current_time, msg, 1, int(encryption)))
-        #conn.commit()
         eel.add_msg_start(timestamp, msg, "Me", encryption, receiver_key)
 
 
@@ -104,7 +102,8 @@ def request_msg(key, current_rowid):
             query[2] = "Info"
         eel.add_msg_end(query[0], query[1], query[2], bool(query[3]), rowid)
         rowid -= 1
-    eel.update_scroll()
+    if not current_rowid:
+        eel.update_scroll()
 
 
 @eel.expose
@@ -128,3 +127,9 @@ def get_mining_log():
 @eel.expose
 def get_name(key):
     eel.insert_name(pub_keys[key][0])
+
+
+@eel.expose
+def edit(key, new_name):
+    pub_keys[key][0] = new_name
+    ui_out.put(["edit", [key, new_name]])

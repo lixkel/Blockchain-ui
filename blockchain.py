@@ -93,6 +93,9 @@ class Blockchain:
         entry = self.c.fetchone()
         self.height = entry[0]
         self.target = entry[2][136:200]
+        if self.height % 10 == 0:
+            logging.debug("start calc_height")
+            self.calc_target()
         self.chainwork = entry[3]
         logging.debug(f"height: {self.height}, target: {self.target}, chainwork: {self.chainwork}")
 
@@ -196,8 +199,11 @@ class Blockchain:
             tx_size = index + message_size + tx_remaining
             tx = block[index:tx_size]
             if tx in self.mempool:
+                print(f"removujem tx: {tx}")
+                print(f"mempool pred: {self.mempool}")
                 self.mempool.remove(tx)
                 self.valid_tx.append(tx)
+                print(f"mempool po: {self.mempool}")
             elif tx in self.valid_tx:#pri temp forku by sa toto dalo obist ale to budem riesit asi pri ui verzii
                 pass
             else:
@@ -251,7 +257,7 @@ class Blockchain:
                     self.send_message("send", cargo=["", peer_pub_key, "00"])
                 self.pub_keys[peer_pub_key][1] = derived_key.hex()
                 logging.debug("posuvam do edit key files")
-                self.edit_key_file(peer_pub_key, derived_key.hex())#musim kukat aj tx od seba ktore nemam
+                self.edit_key_file(peer_pub_key, derived_key.hex(), 2)#musim kukat aj tx od seba ktore nemam
                 exchange_msg = "Výmena kľúčov prebehla úspešne odteraz môžeš správy posielať šifrované"
                 self.c_m.execute(f"INSERT INTO '{peer_pub_key}' VALUES (?,?,?,?);", (timestamp, exchange_msg, 3, 1))
                 self.conn_m.commit()
@@ -273,7 +279,7 @@ class Blockchain:
                 decryptor = cipher.decryptor()
                 msg = decryptor.update(msg)
                 msg = msg.decode("utf-8")
-                print(f"e {user[0]}: {msg}")
+                print(f"{user[0]}: {msg}")
             elif tx_type == "02":
                 msg_size = int(tx[2:6], 16) * 2
                 msg = bytes.fromhex(tx[6:msg_size+6]).decode("utf-8")
@@ -326,7 +332,7 @@ class Blockchain:
         file.close()
 
 
-    def edit_key_file(self, pub_key, new_value,):
+    def edit_key_file(self, pub_key, new_value, index):
         file = open("pubKeyFile", "r")
         all_keys = file.read().split("\n")[:-1]
         file.close()
@@ -334,7 +340,8 @@ class Blockchain:
         for i in all_keys:
             pair = i.split()
             if pair[0] == pub_key:
-                file.write(f"{pair[0]} {pair[1]} {new_value}\n")
+                pair[index] = new_value
+                file.write(f"{pair[0]} {pair[1]} {pair[2]}\n")
             else:
                 file.write(i + "\n")
 
@@ -509,6 +516,7 @@ class Blockchain:
                 return "alrdgot"
         block_target = new_block[136:200]
         if block_target != self.target:
+            logging.debug("append bad block target")
             return False
         if sync and -360 <= int(time()) - int(new_block[208:216], 16) <= 360:
             logging.debug("append bad block timestamp")

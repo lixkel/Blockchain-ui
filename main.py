@@ -600,6 +600,9 @@ try:
                 blockchain.save_key(b, d)
                 cargo = ["", b, "00"]
                 send_message("send", cargo=cargo)
+            elif a == "edit":
+                pub_key, new_name = b
+                blockchain.edit_key_file(pub_key, new_name, 1)
             elif a == "lsnodes":
                 display.put(list(nodes.values()))
             elif a == "start mining":
