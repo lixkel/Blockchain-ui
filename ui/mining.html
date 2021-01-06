@@ -12,15 +12,15 @@
     <div class="wrapper">
       <div class="sidebar">
           <ul>
-              <li><a href="index.html">Ú</a></li>
-              <li><a href="import.html">H</a></li>
-              <li><a href="mining.html">C</a></li>
-              <li><a href="php.html">P</a></li>
-              <li><a href="javascript.html">J</a></li>
+            <li><a href="index.html"><img src="icons/chat.png"></a></li>
+            <li><a href="import.html"><img src="icons/import.png"></a></li>
+            <li><a href="mining.html"><img src="icons/mining.png"></a></li>
           </ul>
       </div>
-      <button onclick="eel.mining()" id="mining">START MINING</button>
-      <div class="log"></div>
+      <div class="main">
+        <button onclick="eel.mining()" id="mining">START MINING</button>
+        <div class="log"></div>
+      </div>
     </div>
     <script>eel.get_mining_log();</script>
   </body>

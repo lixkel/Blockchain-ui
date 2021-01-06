@@ -11,29 +11,30 @@
     <div class="wrapper">
       <div class="sidebar">
           <ul>
-              <li><a href="index.html">Ú</a></li>
-              <li><a href="import.html">H</a></li>
-              <li><a href="mining.html">C</a></li>
-              <li><a href="php.html">P</a></li>
-              <li><a href="javascript.html">J</a></li>
+            <li><a href="index.html"><img src="icons/chat.png"></a></li>
+            <li><a href="import.html"><img src="icons/import.png"></a></li>
+            <li><a href="mining.html"><img src="icons/mining.png"></a></li>
           </ul>
       </div>
-      <div class="head">
-        <label class="switch">
-          <input id="chat_checkbox" type="checkbox" checked>
-          <span class="slider"></span>
-        </label>
+      <div class="main">
+        <div class="head">
+          <button onclick="edit()"><img src="icons/settings.png"></button>
+          <label class="switch">
+            <input id="chat_checkbox" type="checkbox" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="chat" id="chat"><button onclick="msg_load()" id="button">Load msg</button>
+        </div>
+        <div class="box">
+          <input type="text" id="chat_input" placeholder="Stlac Enter pre odoslanie" autofocus  />
+          <button onclick="input_get()"><img src="icons/send.png"></button>
+        </div>
+        <script type="text/javascript" charset="utf-8">
+          var current_rowid = null;
+          init_load();
+        </script>
       </div>
-      <div class="chat" id="chat"><button onclick="msg_load()" id="button">Load msg</button>
-      </div>
-      <div class="box">
-        <input type="text" id="chat_input" placeholder="Stlac Enter pre odoslanie" autofocus  />
-        <button onclick="input_get()">SEND</button>
-      </div>
-      <script type="text/javascript" charset="utf-8">
-        var current_rowid = null;
-        init_load();
-      </script>
     </div>
   </body>
 </html>

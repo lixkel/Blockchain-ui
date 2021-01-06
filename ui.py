@@ -20,6 +20,7 @@ def main(pu_keys, ui_in, ui_ot, my_key):
             a, b = ui_in.get()
             if a == "new":
                 timestamp, msg, sender, encryption, rec_key = b
+                timestamp = datetime.datetime.utcfromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
                 eel.add_msg_start(timestamp, msg, sender, encryption, rec_key)
             if a == "mined":
                 timestamp = datetime.datetime.utcfromtimestamp(b).strftime('%Y-%m-%d %H:%M:%S')
@@ -96,10 +97,10 @@ def request_msg(key, current_rowid):
         query[0] = datetime.datetime.utcfromtimestamp(query[0]).strftime('%Y-%m-%d %H:%M:%S')
         if not query[2]:
             query[2] = name
-        elif query[2]:
-            query[2] = "Me"
-        else:
+        elif query[2] == 3:
             query[2] = "Info"
+        else:
+            query[2] = "Me"
         eel.add_msg_end(query[0], query[1], query[2], bool(query[3]), rowid)
         rowid -= 1
     if not current_rowid:

@@ -83,7 +83,7 @@ function update_scroll(){
 
 function insert_name(name){
     var head = document.getElementsByClassName("head")[0];
-    head.innerHTML = name + '<button onclick="edit()">EDIT</button>' + head.innerHTML;
+    head.innerHTML = name + head.innerHTML;
 }
 
 function edit(){
