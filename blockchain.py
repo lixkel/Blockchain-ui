@@ -192,18 +192,16 @@ class Blockchain:
             tx_type = block[index:index+2]
             if tx_type == "00":
                 message_size = 64-4
+            elif tx_type == "01":
+                message_size = int(block[index+34:index+38], 16) * 2
+                message_size += 32
             else:
                 message_size = int(block[index+2:index+6], 16) * 2
-                if tx_type == "01":
-                    message_size += 32
             tx_size = index + message_size + tx_remaining
             tx = block[index:tx_size]
             if tx in self.mempool:
-                print(f"removujem tx: {tx}")
-                print(f"mempool pred: {self.mempool}")
                 self.mempool.remove(tx)
                 self.valid_tx.append(tx)
-                print(f"mempool po: {self.mempool}")
             elif tx in self.valid_tx:#pri temp forku by sa toto dalo obist ale to budem riesit asi pri ui verzii
                 pass
             else:
