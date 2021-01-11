@@ -176,9 +176,11 @@ class Blockchain:
         if timestamp:
             timestamp = int(timestamp, 16)
             if not -1800 <= timestamp - tx_timestamp <= 1800:
+                logging.debug("tx timestamp is old in block")
                 return False
             #ked bude temp fork a dojdu dva bloky s tymi istymi tx tak ich budem ma t dva krat v db
         elif not -1800 <= int(time()) - tx_timestamp <= 1800:
+            logging.debug("tx timestamp is old")
             return False
         logging.debug("tx True")
         return True
@@ -373,7 +375,7 @@ class Blockchain:
                     if rec_key == i:
                         key = self.pub_keys[i][1]
                         if key == "no" or  key == "sent":
-                            print("s pouzivatelom este neprebehla vymena klucov")
+                            ui_in.put(["warning", "S použivateľom ešte neprebehla výmena kľúčov"])
                             return
                         key = bytes.fromhex(key)
                         break
@@ -395,7 +397,7 @@ class Blockchain:
                 self.c_m.execute(f"INSERT INTO '{rec_key}' VALUES (?,?,?,?);", (current_time, raw_msg, 1, int(not int(msg_type)-1)))
                 self.conn_m.commit()
             else:#tu treba dat aj
-                print("sprava je prilis velka")
+                ui_in.put(["warning", "Správa je príliš dlhá"])
         signature = self.private_key.sign(tx)
         tx = tx + signature
         #na toto verify sa treba pozret ked dorobim verify_tx

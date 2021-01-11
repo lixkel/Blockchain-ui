@@ -77,18 +77,33 @@ function edit_mining(label){
 }
 
 function update_scroll(){
-    var chat = document.getElementById("chat");
-    chat.scrollIntoView(false);
+  var chat = document.getElementById("chat");
+  chat.scrollIntoView(false);
 }
 
 function insert_name(name){
-    var head = document.getElementsByClassName("head")[0];
-    head.innerHTML = name + head.innerHTML;
+  var head = document.getElementsByClassName("head")[0];
+  head.innerHTML = name + head.innerHTML;
 }
 
 function edit(){
-    var new_name = window.prompt("Zadaj nové meno pre tohto použivatela","Martin...");
-		eel.edit(chat_key, new_name)
+  var new_name = window.prompt("Zadaj nové meno pre tohto použivatela","Martin...");
+	eel.edit(chat_key, new_name);
+}
+
+function new_alert(text){
+  var body = document.getElementsByTagName("BODY")[0];
+	body.innerHTML += `<div class="alert">${text}</div>`;
+}
+
+function rm_alert(){
+	var al = document.getElementsByClassName("alert")[0];
+	al.remove();
+}
+
+function warning(msg){
+	var body = document.getElementsByTagName("BODY")[0];
+	body.innerHTML += `<div class="warning"><span class="closebtn" onclick="this.parentElement.remove();">&times;</span>${msg}</div>`;
 }
 
 eel.expose(add_msg_end);
@@ -99,3 +114,6 @@ eel.expose(update_scroll);
 eel.expose(insert_mining_log);
 eel.expose(edit_mining);
 eel.expose(insert_name);
+eel.expose(new_alert);
+eel.expose(rm_alert);
+eel.expose(warning);

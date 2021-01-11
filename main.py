@@ -13,7 +13,7 @@ def handle_message(soc, message):
                 return
             if int(node_version, 16) > int(version, 16):
                 logging.debug("old version")
-                print("vyzera to ze mas zastaralu verziu")
+                ui_in.put(["warning", "Vyzerá to že máš zastaralú verziu"])
             best_height = int(payload[-20:-12], 16)
             nodes[soc.getpeername()].best_height = best_height
             my_addr = decode_ip(payload[-12:-4])
@@ -66,7 +66,6 @@ def handle_message(soc, message):
         logging.debug(f"headers msg: {payload}")
         logging.debug(f"headers sync: {sync}")
         if payload == "00":
-            print("Blockchain synced")
             sync = [True, 0, 0]
             return
         if not sync[0] and sync[2] == soc.getpeername():
@@ -156,7 +155,6 @@ def handle_message(soc, message):
     elif command == "getheaders":
         logging.debug(f"getheaders sync: {sync}")
         if not sync[0] and sync[2] == soc.getpeername():
-            print("Blockchain synced")
             sync = [True, 0, 0]
         chainwork = int(payload[:64], 16)
         if blockchain.chainwork < chainwork:#tu by sa potom dal dat ze expect sync ak to budem chciet robit cez
@@ -305,7 +303,6 @@ def send_message(command, soc = None, cargo = None):
         header = create_header(type, payload_lenght)
         outbound.put(["send", [soc, header + payload]])
     elif command == "sync":
-        print("Synchronizujem zo sieťou")
         sync = [False, int(time()), soc.getpeername()]
         num_headers = 0
         blockchain.c.execute("SELECT rowid FROM blockchain WHERE rowid = (SELECT MAX(rowid) FROM blockchain);")
@@ -448,7 +445,7 @@ def start_mining():
 if __name__ == '__main__':
     blockchain = Blockchain(version, send_message, sync, ui_in, logging)
     local_node = threading.Thread(target=p2p.start_node, args=(port, nodes, inbound, outbound, ban_list, logging))
-    tui = threading.Thread(target=ui.main, args=(blockchain.pub_keys, ui_in, ui_out, blockchain.public_key_hex))
+    tui = threading.Thread(target=ui.main, args=(blockchain.pub_keys, ui_in, ui_out, blockchain.public_key_hex, nodes, sync))
     local_node.start()
     tui.start()
 
@@ -486,7 +483,6 @@ if __name__ == '__main__':
             if len(c.fetchall()) >= 8:
                 outbound.put(["close", list(nodes.values())[0].address])
                 break#treba zatvorit conection
-    print("connecting...")
 
     try:
         while True:
@@ -496,7 +492,6 @@ if __name__ == '__main__':
                     c.execute("SELECT * FROM nodes;")
                     logging.debug(f"con_sent: {con_sent}")
                     logging.debug(c.fetchall())
-                    print("connecting...")
                 if not con_sent:
                     connect()#mozno by bolo lepsie spravit init connect v loope pred tymto
             if not inbound.empty():
@@ -542,7 +537,6 @@ if __name__ == '__main__':
             if not sync[0]:
                 if sync[1] != 0 and  int(time()) - sync[1] > 30:
                     ban_check(sync[2])
-                    print("Blockchain synced")
                     sync = [True, 0, 0]
             if not ui_out.empty():
                 a, b = ui_out.get()
@@ -571,9 +565,9 @@ if __name__ == '__main__':
                     display.put(list(nodes.values()))
                 elif a == "start mining":
                     if not sync[0]:
-                        print("este niesi sync")
+                        ui_in.put(["warning", "Ešte niesi synchronizovaný zo sieťou"])
                         continue
-                    print("minujeme")
+                    ui_in.put(["warning", "Začal si ťažiť"])
                     start_mining()
                     mining = Process(target=mine, args=(mined, to_mine))
                     mining.start()

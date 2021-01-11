@@ -3,13 +3,17 @@ import sqlite3
 import datetime
 from time import time
 
-def main(pu_keys, ui_in, ui_ot, my_key):
-    global c, conn, ui_out, pub_keys, my_pub_key, mine, mining_log, sqlite3
+def main(pu_keys, ui_in, ui_ot, my_key, nodes, sync):
+    global c, conn, ui_out, pub_keys, my_pub_key, mine, mining_log, sqlite3, connecting, syncing, con_alert, sync_alert
     pub_keys = pu_keys
     ui_out = ui_ot
     my_pub_key = my_key
     mine = False
+    connecting = False
+    syncing = False
     mining_log = ""
+    con_alert = "Prebieha pripájanie k sieti"
+    sync_alert = "Synchronizujem blockchain zo sieťou"
     conn = sqlite3.connect("messages.db")
     c = conn.cursor()
     eel.init("ui")
@@ -22,12 +26,30 @@ def main(pu_keys, ui_in, ui_ot, my_key):
                 timestamp, msg, sender, encryption, rec_key = b
                 timestamp = datetime.datetime.utcfromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
                 eel.add_msg_start(timestamp, msg, sender, encryption, rec_key)
-            if a == "mined":
+            elif a == "mined":
                 timestamp = datetime.datetime.utcfromtimestamp(b).strftime('%Y-%m-%d %H:%M:%S')
                 entry = f"{timestamp} You mined new block\n"
                 mining_log += entry
                 eel.insert_mining_log(entry)
-        eel.sleep(2.0)
+            elif a == "warning":
+                eel.warning(b)
+        if nodes == {} and not connecting:
+            print("con alert")
+            connecting = True
+            eel.new_alert(con_alert)
+        if nodes != {} and connecting:
+            connecting = False
+            print("rm alert")
+            eel.rm_alert()
+        if not sync[0] and not syncing:
+            print("sync alert")
+            syncing = True
+            eel.new_alert(sync_alert)
+        if sync[0] and syncing:
+            print("rm sync alert")
+            syncing = False
+            eel.rm_alert()
+        eel.sleep(2)
 
 
 @eel.expose
@@ -59,6 +81,8 @@ def send_msg(msg, receiver_key, encryption):
         print("putujem do ui_out")
         ui_out.put(["send", [receiver_key, msg, encryption]])
         eel.add_msg_start(timestamp, msg, "Me", encryption, receiver_key)
+    else:
+        eel.warning("Správa je príliš dlhá")
 
 
 @eel.expose
@@ -134,3 +158,11 @@ def get_name(key):
 def edit(key, new_name):
     pub_keys[key][0] = new_name
     ui_out.put(["edit", [key, new_name]])
+
+
+@eel.expose
+def check_alert():
+    if connecting:
+        eel.new_alert(con_alert)
+    elif syncing:
+        eel.new_alert(sync_alert)

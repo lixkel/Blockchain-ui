@@ -23,7 +23,13 @@
           </ul>
         </div>
       </div>
-      <script>eel.request_keys()</script>
+      <script>
+      eel.request_keys();
+      eel.check_alert();
+      new_alert("chuj");
+      await sleep(500);
+      rm_alert();
+      </script>
     </div>
   </body>
 </html>

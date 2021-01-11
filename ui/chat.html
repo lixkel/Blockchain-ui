@@ -18,7 +18,7 @@
       </div>
       <div class="main">
         <div class="head">
-          <button onclick="edit()"><img src="icons/settings.png"></button>
+          <span onclick="edit()"><img src="icons/settings.png"></span>
           <label class="switch">
             <input id="chat_checkbox" type="checkbox" checked>
             <span class="slider"></span>
@@ -28,10 +28,11 @@
         </div>
         <div class="box">
           <input type="text" id="chat_input" placeholder="Stlac Enter pre odoslanie" autofocus  />
-          <button onclick="input_get()"><img src="icons/send.png"></button>
+          <span onclick="input_get()"><img src="icons/send.png"></span>
         </div>
         <script type="text/javascript" charset="utf-8">
           var current_rowid = null;
+          eel.check_alert();
           init_load();
         </script>
       </div>
