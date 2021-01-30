@@ -37,7 +37,7 @@ class Blockchain:
                 block TEXT,
                 chainwork INTEGER)
                 """)
-            genesis = "000000010000000000000000000000000000000000000000000000000000000000000000bddab8eec58661df775b5c365f31bc494d6109a7eb0e6f6a6d2ba03f49d1042300000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff6004cc1000008e9d01020018536ec3a1c48f20746f20627564652066756e676f7661c5a56004cc10bb03a30a81630d8447b38c7ebcdd0fbde3c04cb454fb4cad21ce98aaa375a82735f7319b55185034598c724e59999cd971eeec93f48a9d1b3470501e2d8821dd9014b0b4e7976b641e322e6ec8d4b6c8e2195a4baf8a43ca5d28bb2159379d030e531f2da8e55edb9597e3e959995cdc9b7bc11b6f849e479d9b8536f52d880f"
+            genesis = "0000000100000000000000000000000000000000000000000000000000000000000000009ee453f4661baadf27aa2ad55b9f0916c5af9146b2bc5e30531cf9ead14faab400000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff6004cc1000036ac401020018536ec3a1c48f20746f20627564652066756e676f7661c5a56004cc10bb03a30a81630d8447b38c7ebcdd0fbde3c04cb454fb4cad21ce98aaa375a82735f7319b55185034598c724e59999cd971eeec93f48a9d1b3470501e2d8821dd9014b0b4e7976b641e322e6ec8d4b6c8e2195a4baf8a43ca5d28bb2159379d030e531f2da8e55edb9597e3e959995cdc9b7bc11b6f849e479d9b8536f52d880f"
             gen_hash = self.hash(genesis[:216])
             gen_chainwork = int(2**256/int(genesis[136:200], 16))
             self.c.execute("INSERT INTO blockchain VALUES (?,?,?);", (gen_hash, genesis, gen_chainwork))
@@ -209,6 +209,7 @@ class Blockchain:
             else:
                 self.tx_content(tx)
                 self.valid_tx.append(tx)
+            index = tx_size
 
 
     def tx_content(self, tx):

@@ -27,7 +27,14 @@ function add_msg_end(time, msg, sender, encryption, rowid){
 	var button = document.getElementById("button");
 	button.remove();
 	var chat = document.getElementsByClassName("chat")[0];
-	chat.innerHTML = `<hr class="divider" /><div class="message"><div class="username">${encryption} ${sender}<span class="timestamp">${time}</span></div><div class="content">${msg}</div></div>` + chat.innerHTML;
+	var icon;
+	if(encryption){
+		icon = `<img src="icons/locked.png">`;
+	}
+	else{
+		icon = `<img src="icons/unlocked.png">`;
+	}
+	chat.innerHTML = `<hr class="divider" /><div class="message"><div class="username">${icon} ${sender}<span class="timestamp">${time}</span></div><div class="content">${msg}</div></div>` + chat.innerHTML;
 	if (current_rowid != 1){
 		chat.innerHTML = `<button onclick="msg_load()" id="button">Load msg</button>` + chat.innerHTML;
 	}
@@ -35,7 +42,7 @@ function add_msg_end(time, msg, sender, encryption, rowid){
 
 function add_msg_start(time, msg, sender, encryption, receiver_key){
 	if (receiver_key != chat_key){
-		alert("msg nie do tochto chatu");
+		warning(`Nová správa od ${sender}`);
 		return;
 	}
 	var chat = document.getElementsByClassName("chat")[0];
@@ -92,11 +99,13 @@ function edit(){
 }
 
 function new_alert(text){
+	alert("new alert");
   var body = document.getElementsByTagName("BODY")[0];
 	body.innerHTML += `<div class="alert">${text}</div>`;
 }
 
 function rm_alert(){
+	alert("rm alert");
 	var al = document.getElementsByClassName("alert")[0];
 	al.remove();
 }
@@ -104,6 +113,12 @@ function rm_alert(){
 function warning(msg){
 	var body = document.getElementsByTagName("BODY")[0];
 	body.innerHTML += `<div class="warning"><span class="closebtn" onclick="this.parentElement.remove();">&times;</span>${msg}</div>`;
+}
+
+function check_key(ele){
+	if(event.keyCode === 13) {
+		input_get();
+	}
 }
 
 eel.expose(add_msg_end);

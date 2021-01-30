@@ -27,7 +27,7 @@
         <div class="chat" id="chat"><button onclick="msg_load()" id="button">Load msg</button>
         </div>
         <div class="box">
-          <input type="text" id="chat_input" placeholder="Stlac Enter pre odoslanie" autofocus  />
+          <input type="text" id="chat_input" placeholder="Stlač Enter pre odoslanie" autofocus onkeydown="check_key(this)" />
           <span onclick="input_get()"><img src="icons/send.png"></span>
         </div>
         <script type="text/javascript" charset="utf-8">

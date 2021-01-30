@@ -34,19 +34,15 @@ def main(pu_keys, ui_in, ui_ot, my_key, nodes, sync):
             elif a == "warning":
                 eel.warning(b)
         if nodes == {} and not connecting:
-            print("con alert")
             connecting = True
             eel.new_alert(con_alert)
         if nodes != {} and connecting:
             connecting = False
-            print("rm alert")
             eel.rm_alert()
         if not sync[0] and not syncing:
-            print("sync alert")
             syncing = True
             eel.new_alert(sync_alert)
         if sync[0] and syncing:
-            print("rm sync alert")
             syncing = False
             eel.rm_alert()
         eel.sleep(2)

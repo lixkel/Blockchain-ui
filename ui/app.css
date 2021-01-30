@@ -112,12 +112,17 @@ body::-webkit-scrollbar-track-piece {
 }
 
 .wrapper .box input {
-  width: calc(100% - 50px);
+  width: calc(100% - 24px);
   border: 1px solid #23262a;
   background: #36393f;
   padding: 0.5rem;
   color: hsla(0,0%,100%,.7);
   font-size: 12px;
+}
+
+.wrapper .box img {
+  text-align: center;
+  position: absolute;
 }
 
 .wrapper .head {
@@ -126,7 +131,7 @@ body::-webkit-scrollbar-track-piece {
   width: calc(100% - 50px);
   background-color: #36393f;
   padding: 0.5rem;
-  border-top: 1px solid #23262a;
+  border-bottom: 1px solid #23262a;
 }
 
 .wrapper .people{
@@ -236,6 +241,19 @@ input:checked + .slider:before {
   visibility: hidden;
 }
 
+.export {
+  display: flex;
+  justify-content: center;
+  color: #dcddde;
+}
+
+.export_head {
+  margin: 2%;
+  display: flex;
+  justify-content: center;
+  color: #dcddde;
+}
+
 .alert {
   position: absolute;
   bottom: 0;
@@ -267,4 +285,21 @@ input:checked + .slider:before {
 
 .closebtn:hover {
   color: black;
+}
+
+.button{
+  width: 220px;
+  height: 50px;
+  cursor: pointer;
+  display: block;
+  margin: auto;
+  background: #019875 no-repeat center center;
+  color: #fff;
+  text-transform: uppercase;
+  font-size: 20px;
+  font-weight: bold;
+  border: 0;
+  padding: 15px 20px;
+  border-radius: 50px;
+  outline: 0;
 }

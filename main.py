@@ -514,6 +514,7 @@ if __name__ == '__main__':
                     logging.debug("block neappendnuty")
                 start_mining()
             if int(time()) - stime > 1800:
+                print("time ta pecka")
                 num_time += 1
                 current_time = int(time())
                 for tx in blockchain.valid_tx:
@@ -524,6 +525,7 @@ if __name__ == '__main__':
                     if current_time - i.lastrecv > 5400:
                         outbound.put(["close", i.address])
                     elif current_time - i.lastsend > 1800:
+                        print("time active")
                         send_message("only", soc=nodes[soc.getpeername()].socket, cargo="active")
                 if num_time == 48:
                     send_message("addr", cargo="broadcast")
