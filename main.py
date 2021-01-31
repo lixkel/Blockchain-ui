@@ -154,6 +154,8 @@ def handle_message(soc, message):
         send_message("broadcast", soc=soc.getpeername(),  cargo=[new_message, "headers"])
     elif command == "getheaders":
         logging.debug(f"getheaders sync: {sync}")
+        if not sync[0]:
+            return
         if not sync[0] and sync[2] == soc.getpeername():
             sync = [True, 0, 0]
         chainwork = int(payload[:64], 16)
@@ -440,9 +442,8 @@ def start_mining():
     to_mine.put([block_header, txs])
 
 
-
-
-if __name__ == '__main__':
+def main():
+    global sync, mining, con_sent, blockchain, stime, prev_time
     blockchain = Blockchain(version, send_message, sync, ui_in, logging)
     local_node = threading.Thread(target=p2p.start_node, args=(port, nodes, inbound, outbound, ban_list, logging))
     tui = threading.Thread(target=ui.main, args=(blockchain.pub_keys, ui_in, ui_out, blockchain.public_key_hex, nodes, sync))
@@ -603,3 +604,7 @@ if __name__ == '__main__':
         print("crash daco sa pokazilo!!!!!!!!!!!!!!!!!!!!!!!!")
         outbound.put(["end", []])
         local_node.join()
+
+
+if __name__ == '__main__':
+    main()

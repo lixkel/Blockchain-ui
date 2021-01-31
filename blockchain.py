@@ -540,7 +540,7 @@ class Blockchain:
         self.c.execute("SELECT * FROM blockchain WHERE rowid = (?);", (calc_height - 9,))
         lowest = int(self.c.fetchone()[1][200:208], 16)
         difference = heighest - lowest
-        change = float(difference) / 300.0
+        change = float(difference) / 600.0
         if change > 4.0:
             change = 4.0
         elif change < 0.25:
@@ -552,6 +552,7 @@ class Blockchain:
         elif len(new_target) > 64:
             new_target = "f" * 64
         self.target = new_target
+        logging.debug(f"difference: {difference}")
         logging.debug(f"difficulty change: {change}")
         logging.debug(f"new target: {self.target}")
 
