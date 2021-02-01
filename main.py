@@ -593,6 +593,8 @@ def main():
                 elif a == "end":
                     outbound.put(["end", []])
                     local_node.join()
+                    ui_in.put(["end", ""])
+                    tui.join()
                     if mining:
                         mining.terminate()
                     break
@@ -604,6 +606,8 @@ def main():
         print("crash daco sa pokazilo!!!!!!!!!!!!!!!!!!!!!!!!")
         outbound.put(["end", []])
         local_node.join()
+        ui_in.put(["end", ""])
+        tui.join()
 
 
 if __name__ == '__main__':
