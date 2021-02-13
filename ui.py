@@ -17,7 +17,7 @@ def main(pu_keys, ui_in, ui_ot, my_key, nodes, sync):
     conn = sqlite3.connect("messages.db")
     c = conn.cursor()
     eel.init("ui")
-    eel.start("index.html", block=False, size=(1024, 768), position=(0,0), close_callback=close_callback)
+    eel.start("index.html", block=False, size=(650, 750), position=(0,0))
 
     while True:
         if not ui_in.empty():
@@ -51,7 +51,10 @@ def main(pu_keys, ui_in, ui_ot, my_key, nodes, sync):
 
 
 def close_callback(route, websockets):
-    ui_out.put(["end", ""])
+    print(f"route {route}")
+    print(f"websock {websockets}")
+    if not websockets:
+        ui_out.put(["end", ""])
 
 
 @eel.expose
@@ -164,6 +167,7 @@ def edit(key, new_name):
 
 @eel.expose
 def check_alert():
+    eel.rm_all_alerts()
     if connecting:
         eel.new_alert(con_alert)
     elif syncing:

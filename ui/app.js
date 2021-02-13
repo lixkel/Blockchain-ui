@@ -45,8 +45,14 @@ function add_msg_start(time, msg, sender, encryption, receiver_key){
 		warning(`Nová správa od ${sender}`);
 		return;
 	}
+	if(encryption){
+		icon = `<img src="icons/locked.png">`;
+	}
+	else{
+		icon = `<img src="icons/unlocked.png">`;
+	}
 	var chat = document.getElementsByClassName("chat")[0];
-	chat.innerHTML += `<hr class="divider" /><div class="message"><div class="username">${encryption} ${sender}<span class="timestamp">${time}</span></div><div class="content">${msg}</div></div>`;
+	chat.innerHTML += `<hr class="divider" /><div class="message"><div class="username">${icon} ${sender}<span class="timestamp">${time}</span></div><div class="content">${msg}</div></div>`;
 	update_scroll();
 }
 
@@ -99,15 +105,20 @@ function edit(){
 }
 
 function new_alert(text){
-	alert("new alert");
   var body = document.getElementsByTagName("BODY")[0];
 	body.innerHTML += `<div class="alert">${text}</div>`;
 }
 
 function rm_alert(){
-	alert("rm alert");
 	var al = document.getElementsByClassName("alert")[0];
 	al.remove();
+}
+
+function rm_all_alerts(){
+	var matches = document.getElementsByClassName("alert");
+	for (var i = matches.length - 1; i >= 0; --i) {
+  	matches[i].remove();
+	}
 }
 
 function warning(msg){
@@ -131,4 +142,5 @@ eel.expose(edit_mining);
 eel.expose(insert_name);
 eel.expose(new_alert);
 eel.expose(rm_alert);
+eel.expose(rm_all_alerts);
 eel.expose(warning);

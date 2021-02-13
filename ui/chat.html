@@ -18,13 +18,21 @@
       </div>
       <div class="main">
         <div class="head">
-          <span onclick="edit()"><img src="icons/settings.png"></span>
-          <label class="switch">
-            <input id="chat_checkbox" type="checkbox" checked>
-            <span class="slider"></span>
-          </label>
+          <span style="cursor: pointer;" onclick="edit()"><img src="icons/settings.png"></span>
+          <div class="togdiv">
+            <label class="label">
+              <div class="toggle">
+                <input class="toggle-state" id="chat_checkbox" type="checkbox" name="check" value="check" checked />
+                <div class="toggle-inner">
+                  <div class="indicator"></div>
+                </div>
+                <div class="active-bg"></div>
+              </div>
+              <div class="label-text">Encryption</div>
+            </label>
+          </div>
         </div>
-        <div class="chat" id="chat"><button onclick="msg_load()" id="button">Load msg</button>
+        <div class="chat" id="chat"><button class="button_message" onclick="msg_load()" id="button">Load msg</button>
         </div>
         <div class="box">
           <input type="text" id="chat_input" placeholder="Stlač Enter pre odoslanie" autofocus onkeydown="check_key(this)" />

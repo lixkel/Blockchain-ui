@@ -154,7 +154,7 @@ def handle_message(soc, message):
         send_message("broadcast", soc=soc.getpeername(),  cargo=[new_message, "headers"])
     elif command == "getheaders":
         logging.debug(f"getheaders sync: {sync}")
-        if not sync[0]:
+        if not sync[0] and sync[2] != soc.getpeername():
             return
         if not sync[0] and sync[2] == soc.getpeername():
             sync = [True, 0, 0]
@@ -443,7 +443,7 @@ def start_mining():
 
 
 def main():
-    global sync, mining, con_sent, blockchain, stime, prev_time
+    global sync, mining, con_sent, blockchain, stime, prev_time, num_time
     blockchain = Blockchain(version, send_message, sync, ui_in, logging)
     local_node = threading.Thread(target=p2p.start_node, args=(port, nodes, inbound, outbound, ban_list, logging))
     tui = threading.Thread(target=ui.main, args=(blockchain.pub_keys, ui_in, ui_out, blockchain.public_key_hex, nodes, sync))
@@ -541,6 +541,15 @@ def main():
                 if sync[1] != 0 and  int(time()) - sync[1] > 30:
                     ban_check(sync[2])
                     sync = [True, 0, 0]
+            if not tui.is_alive():
+                print("dead")
+                outbound.put(["end", []])
+                local_node.join()
+                ui_in.put(["end", ""])
+                tui.join()
+                if mining:
+                    mining.terminate()
+                break
             if not ui_out.empty():
                 a, b = ui_out.get()
                 logging.debug(f"cli a: {a}")
