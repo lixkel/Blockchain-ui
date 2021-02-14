@@ -42,6 +42,7 @@ def main(pu_keys, ui_in, ui_ot, my_key, nodes, sync):
             connecting = False
             eel.rm_alert()
         if not sync[0] and not syncing:
+            print("ta pecka sync")
             syncing = True
             eel.new_alert(sync_alert)
         if sync[0] and syncing:

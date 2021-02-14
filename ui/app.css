@@ -80,6 +80,7 @@ body::-webkit-scrollbar-track-piece {
 .wrapper .chat .message .content{
   margin-top: 4px;
   font-size: 0.9375rem;
+  word-wrap: break-word;
 }
 
 .wrapper .chat .message .username {
@@ -132,6 +133,7 @@ body::-webkit-scrollbar-track-piece {
   background-color: #36393f;
   padding: 0.5rem;
   border-bottom: 1px solid #23262a;
+  color: #dcddde;
 }
 
 .wrapper .people{
@@ -161,6 +163,8 @@ body::-webkit-scrollbar-track-piece {
   font-weight: 400;
   letter-spacing: 0;
   margin-left: 0.3rem;
+  color: #dcddde;
+  word-wrap: break-word;
 }
 
 .wrapper .import {
@@ -202,7 +206,7 @@ body::-webkit-scrollbar-track-piece {
 }
 
 .alert {
-  position: absolute;
+  position: fixed;
   bottom: 0;
   width: 100%;
   padding: 20px;
@@ -211,7 +215,7 @@ body::-webkit-scrollbar-track-piece {
 }
 
 .warning {
-  position: absolute;
+  position: fixed;
   bottom: 0;
   width: 100%;
   padding: 20px;

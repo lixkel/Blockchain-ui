@@ -36,7 +36,7 @@ function add_msg_end(time, msg, sender, encryption, rowid){
 	}
 	chat.innerHTML = `<hr class="divider" /><div class="message"><div class="username">${icon} ${sender}<span class="timestamp">${time}</span></div><div class="content">${msg}</div></div>` + chat.innerHTML;
 	if (current_rowid != 1){
-		chat.innerHTML = `<button onclick="msg_load()" id="button">Load msg</button>` + chat.innerHTML;
+		chat.innerHTML = `<button class="button_message" onclick="msg_load()" id="button">Load msg</button>` + chat.innerHTML;
 	}
 }
 
