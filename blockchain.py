@@ -566,7 +566,7 @@ class Blockchain:
         new = []
         try:
             orphan = self.orphans[top_hash]
-            if self.append(orphan):
+            if self.append(orphan, sync):
                 del self.orphans[top_hash]
                 new.append(self.hash(orphan[:216]))
                 for i in self.check_orphans(self.hash(orphan[:216])):

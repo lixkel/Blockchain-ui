@@ -4,6 +4,7 @@
     <meta name="generator" charset="utf-8">
     <link rel="stylesheet" type="text/css" href="app.css">
     <title>Chat</title>
+    <link rel="icon" href="icons/decent.ico" type="ico">
     <script src="eel.js"></script>
     <script src="app.js" type="text/javascript" charset="utf-8"></script>
   </head>
@@ -11,9 +12,9 @@
     <div class="wrapper">
       <div class="sidebar">
           <ul>
-              <li><a href="index.html"><img src="icons/chat.png"></a></li>
-              <li><a href="import.html"><img src="icons/import.png"></a></li>
-              <li><a href="mining.html"><img src="icons/mining.png"></a></li>
+            <li><a href="index.html"><img src="icons/chat.png"></a></li>
+            <li><a href="import.html"><img src="icons/import.png"></a></li>
+            <li><a href="mining.html"><img src="icons/mining.png"></a></li>
           </ul>
       </div>
       <div class="main">
@@ -22,9 +23,10 @@
           </ul>
         </div>
       </div>
+      <audio id="notification" src="sounds/notification.mp3" muted></audio>
       <script>
-      eel.request_keys();
-      eel.check_alert();
+        eel.request_keys();
+        eel.check_alert();
       </script>
     </div>
   </body>

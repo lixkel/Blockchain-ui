@@ -4,6 +4,7 @@
     <meta name="generator" charset="utf-8">
     <link rel="stylesheet" type="text/css" href="app.css">
     <title>Chat</title>
+    <link rel="icon" href="icons/decent.ico" type="ico">
     <script src="eel.js"></script>
     <script src="app.js" type="text/javascript" charset="utf-8"></script>
   </head>
@@ -38,6 +39,7 @@
           <input type="text" id="chat_input" placeholder="Stlač Enter pre odoslanie" autofocus onkeydown="check_key(this)" />
           <span onclick="input_get()"><img src="icons/send.png"></span>
         </div>
+        <audio id="notification" src="sounds/notification.mp3" muted></audio>
         <script type="text/javascript" charset="utf-8">
           var current_rowid = null;
           eel.check_alert();

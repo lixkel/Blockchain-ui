@@ -67,6 +67,7 @@ def handle_message(soc, message):
         logging.debug(f"headers sync: {sync}")
         if payload == "00":
             sync = [True, 0, 0]
+            ui_in.put(["sync_t", ""])
             return
         if not sync[0] and sync[2] == soc.getpeername():
             sync[1] = 0
@@ -158,6 +159,7 @@ def handle_message(soc, message):
             return
         if not sync[0] and sync[2] == soc.getpeername():
             sync = [True, 0, 0]
+            ui_in.put(["sync_t", ""])
         chainwork = int(payload[:64], 16)
         if blockchain.chainwork < chainwork:#tu by sa potom dal dat ze expect sync ak to budem chciet robit cez
             logging.debug("node ma vacsi chainwork")
@@ -306,6 +308,7 @@ def send_message(command, soc = None, cargo = None):
         outbound.put(["send", [soc, header + payload]])
     elif command == "sync":
         sync = [False, int(time()), soc.getpeername()]
+        ui_in.put(["sync_f", ""])
         num_headers = 0
         blockchain.c.execute("SELECT rowid FROM blockchain WHERE rowid = (SELECT MAX(rowid) FROM blockchain);")
         rowid = blockchain.c.fetchone()[0]
@@ -541,6 +544,7 @@ def main():
                 if sync[1] != 0 and  int(time()) - sync[1] > 30:
                     ban_check(sync[2])
                     sync = [True, 0, 0]
+                    ui_in.put(["sync_t", ""])
             if not tui.is_alive():
                 print("dead")
                 outbound.put(["end", []])

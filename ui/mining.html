@@ -4,6 +4,7 @@
     <meta name="generator" charset="utf-8">
     <link rel="stylesheet" type="text/css" href="app.css">
     <title>Mining</title>
+    <link rel="icon" href="icons/decent.ico" type="ico">
     <script src="eel.js"></script>
     <script src="app.js" type="text/javascript" charset="utf-8"></script>
   </head>
@@ -21,9 +22,10 @@
         <div class="log"></div>
       </div>
     </div>
+    <audio id="notification" src="sounds/notification.mp3" muted></audio>
     <script>
-    eel.check_alert();
-    eel.get_mining_log();
-  </script>
+      eel.check_alert();
+      eel.get_mining_log();
+    </script>
   </body>
 </html>

@@ -41,6 +41,7 @@ function add_msg_end(time, msg, sender, encryption, rowid){
 }
 
 function add_msg_start(time, msg, sender, encryption, receiver_key){
+	notification();
 	if (receiver_key != chat_key){
 		warning(`Nová správa od ${sender}`);
 		return;
@@ -130,6 +131,11 @@ function check_key(ele){
 	if(event.keyCode === 13) {
 		input_get();
 	}
+}
+
+function notification() {
+	document.getElementById('notification').muted = false;
+	document.getElementById('notification').play();
 }
 
 eel.expose(add_msg_end);

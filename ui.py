@@ -17,7 +17,7 @@ def main(pu_keys, ui_in, ui_ot, my_key, nodes, sync):
     conn = sqlite3.connect("messages.db")
     c = conn.cursor()
     eel.init("ui")
-    eel.start("index.html", block=False, size=(650, 750), position=(0,0))
+    eel.start("index.html", block=False, size=(650, 750), position=(0,0), cmdline_args=['--autoplay-policy=no-user-gesture-required'])
 
     while True:
         if not ui_in.empty():
@@ -33,6 +33,14 @@ def main(pu_keys, ui_in, ui_ot, my_key, nodes, sync):
                 eel.insert_mining_log(entry)
             elif a == "warning":
                 eel.warning(b)
+            elif a == "sync_f" and not syncing:
+                print("sync_f")
+                syncing = True
+                eel.new_alert(sync_alert)
+            elif a == "sync_t":
+                print("sync_t")
+                syncing = False
+                eel.rm_alert()
             elif a == "end":
                 break
         if nodes == {} and not connecting:
@@ -40,13 +48,6 @@ def main(pu_keys, ui_in, ui_ot, my_key, nodes, sync):
             eel.new_alert(con_alert)
         if nodes != {} and connecting:
             connecting = False
-            eel.rm_alert()
-        if not sync[0] and not syncing:
-            print("ta pecka sync")
-            syncing = True
-            eel.new_alert(sync_alert)
-        if sync[0] and syncing:
-            syncing = False
             eel.rm_alert()
         eel.sleep(2)
 
