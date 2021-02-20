@@ -41,7 +41,9 @@ function add_msg_end(time, msg, sender, encryption, rowid){
 }
 
 function add_msg_start(time, msg, sender, encryption, receiver_key){
-	notification();
+	if (sender != "Me"){
+		notification();
+	}
 	if (receiver_key != chat_key){
 		warning(`Nová správa od ${sender}`);
 		return;
@@ -77,9 +79,13 @@ function insert_exported_key(key){
 	export_key.innerHTML = key;
 }
 
-function insert_mining_log(entry){
+function insert_mining_log(entry, mining_bool){
 	if (location.href.split("/").slice(-1) != "mining.html"){
 		return;
+	}
+	if (mining_bool){
+		var mining_button = document.getElementById("mining");
+		mining_button.innerHTML = "STOP MINING";
 	}
 	var log = document.getElementsByClassName("log")[0];
 	log.innerHTML += entry;

@@ -17,7 +17,7 @@ def main(pu_keys, ui_in, ui_ot, my_key, nodes, sync):
     conn = sqlite3.connect("messages.db")
     c = conn.cursor()
     eel.init("ui")
-    eel.start("index.html", block=False, size=(650, 750), position=(0,0), cmdline_args=['--autoplay-policy=no-user-gesture-required'])
+    eel.start("index.html", block=False, size=(650, 750), cmdline_args=['--autoplay-policy=no-user-gesture-required'])
 
     while True:
         if not ui_in.empty():
@@ -49,7 +49,7 @@ def main(pu_keys, ui_in, ui_ot, my_key, nodes, sync):
         if nodes != {} and connecting:
             connecting = False
             eel.rm_alert()
-        eel.sleep(2)
+        eel.sleep(0.5)
 
 
 def close_callback(route, websockets):
@@ -153,7 +153,8 @@ def mining():
 
 @eel.expose
 def get_mining_log():
-    eel.insert_mining_log(mining_log)
+    global mine
+    eel.insert_mining_log(mining_log, mine)
 
 
 @eel.expose

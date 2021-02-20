@@ -530,7 +530,7 @@ def main():
                         outbound.put(["close", i.address])
                     elif current_time - i.lastsend > 1800:
                         print("time active")
-                        send_message("only", soc=nodes[soc.getpeername()].socket, cargo="active")
+                        send_message("only", soc=nodes[i.socket.getpeername()].socket, cargo="active")
                 if num_time == 48:
                     send_message("addr", cargo="broadcast")
                     c.execute("SELECT MAX(rowid) FROM nodes;")
