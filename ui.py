@@ -13,7 +13,7 @@ def main(pu_keys, ui_in, ui_ot, my_key, nodes, sync):
     syncing = False
     mining_log = ""
     con_alert = "Prebieha pripájanie k sieti"
-    sync_alert = "Synchronizujem blockchain zo sieťou"
+    sync_alert = "Blockchain sa synchronizuje zo sieťou, môže to chvíľu trvať"
     conn = sqlite3.connect("messages.db")
     c = conn.cursor()
     eel.init("ui")
@@ -82,7 +82,9 @@ def export_key():
 @eel.expose
 def send_msg(msg, receiver_key, encryption):
     global time, datetime
-    if len(msg.encode("utf-8").hex()) <= 1000:
+    if encryption and (pub_keys[receiver_key][1] == "no" or pub_keys[receiver_key][1] == "sent"):
+        eel.warning("Ešte nemôžeš posielať šifrované správy")
+    elif len(msg.encode("utf-8").hex()) <= 1000:
         current_time = int(time())
         timestamp = datetime.datetime.utcfromtimestamp(current_time).strftime('%Y-%m-%d %H:%M:%S')
         print("putujem do ui_out")
@@ -141,6 +143,9 @@ def request_msg(key, current_rowid):
 @eel.expose
 def mining():
     global mine
+    if syncing:
+        eel.warning("Nemôžeš ťažiť kým niesi synchronizovaný zo sieťou")
+        return
     if mine:
         ui_out.put(["stop mining", None])
         eel.edit_mining("START MINING")

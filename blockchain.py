@@ -376,7 +376,7 @@ class Blockchain:
                     if rec_key == i:
                         key = self.pub_keys[i][1]
                         if key == "no" or  key == "sent":
-                            ui_in.put(["warning", "S použivateľom ešte neprebehla výmena kľúčov"])
+                            self.ui_in.put(["warning", "S použivateľom ešte neprebehla výmena kľúčov"])
                             return
                         key = bytes.fromhex(key)
                         break
@@ -398,7 +398,7 @@ class Blockchain:
                 self.c_m.execute(f"INSERT INTO '{rec_key}' VALUES (?,?,?,?);", (current_time, raw_msg, 1, int(not int(msg_type)-1)))
                 self.conn_m.commit()
             else:#tu treba dat aj
-                ui_in.put(["warning", "Správa je príliš dlhá"])
+                self.ui_in.put(["warning", "Správa je príliš dlhá"])
         signature = self.private_key.sign(tx)
         tx = tx + signature
         #na toto verify sa treba pozret ked dorobim verify_tx
