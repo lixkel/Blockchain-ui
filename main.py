@@ -110,11 +110,19 @@ def handle_message(soc, message):
             appended = blockchain.append(payload, sync[0])
             logging.debug(f"block appended: {appended}")
             if appended == "orphan":
-                new_message = "01" + payload[8:72]
-                send_message("universal", soc=soc, cargo=[new_message, "getblocks"])
-                expec_blocks += 1
+                if sync[0] == False and expec_blocks == 0 and sync[1] == 0:
+                    logging.debug("block posielam sync")
+                    send_message("sync", soc=soc)
+                    return
+                if sync[0]:
+                    new_message = "01" + payload[8:72]
+                    send_message("universal", soc=soc, cargo=[new_message, "getblocks"])
+                    expec_blocks += 1
                 return
             elif appended == "alrdgot":
+                if sync[0] == False and expec_blocks == 0 and sync[1] == 0:
+                    logging.debug("block posielam sync")
+                    send_message("sync", soc=soc)
                 return
             elif appended == "appended":
                 if sync[0]:
