@@ -9,7 +9,7 @@ I wrote this back in 2020 (I promise my coding skills improved, I even write com
 ## Usage
 > **Warning:** This messenger won't work as the initial peer discovery relies on hardcoed node which is offline (but you can still run your own).
 
-All you have to do is run the main.py with python3. There is also [CLI version](https://github.com/lixkel/Blockchain).
+The python [Eel](https://github.com/lixkel/Blockchain) library has to be installed on the system, after that all you have to do is run the main.py with python3. There is also [CLI version](https://github.com/lixkel/Blockchain).
 
 ## Technical details
 
